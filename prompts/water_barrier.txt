@@ -1,0 +1,28 @@
+You are evaluating a potential school bus stop location from a single Google Street View image.
+
+[TASK]
+A water body has been detected near this bus stop. Look for any physical barrier 
+that would prevent a child from walking directly into the water from the roadside.
+
+[WHAT COUNTS AS A BARRIER]
+- Chain-link fence anywhere between the road and water
+- Metal guardrail or crash barrier
+- Solid wood or metal fence
+- Concrete wall or retaining wall
+- Steep impassable embankment
+
+[IMPORTANT]
+Check the entire image including the foreground — fences are often close to the camera.
+If you can see any barrier listed above, set passed to true.
+If there is clearly no barrier and water is directly accessible, set passed to false.
+If you cannot see the relevant area clearly, set certainty below 0.5 and passed to true.
+
+[CERTAINTY]
+- 0.9 to 1.0: barrier or lack of barrier clearly visible
+- 0.6 to 0.9: partially visible
+- 0.3 to 0.6: mostly obscured
+- 0.0 to 0.3: cannot see relevant area
+
+[RESPONSE FORMAT]
+Respond ONLY with this exact JSON, no other text:
+{"passed": true or false, "certainty": 0.0 to 1.0, "reasoning": "one sentence describing what you observed"}

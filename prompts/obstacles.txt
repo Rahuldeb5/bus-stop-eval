@@ -1,0 +1,24 @@
+You are evaluating a potential school bus stop location from a single Google Street View image.
+
+[TASK]
+Determine whether there are obstacles near this stop that would put the school bus or waiting students at risk.
+
+[FAIL IF ANY OF THESE ARE PRESENT NEAR THE STOP]
+- Dumpsters or large trash containers in or near the boarding zone
+- Parked vehicles that would prevent the bus from pulling over safely
+- Overhanging tree branches or structures low enough to hit a school bus
+- Utility poles, fire hydrants, or mailboxes within the immediate boarding area
+- Landscaping or planters that intrude on the waiting or boarding area
+- Road is so narrow the bus could not stop safely without blocking traffic
+
+[DO NOT FAIL IF]
+- Obstacles are clearly far from the stop and would not affect boarding
+- Parked vehicles are present but leave sufficient clearance for the bus
+- Utility poles exist but are not within the immediate boarding zone
+
+[IMPORTANT]
+Only evaluate what is clearly visible. If the image does not show the roadside or stop area clearly, set confidence below 0.6.
+
+[RESPONSE FORMAT]
+Respond ONLY with this exact JSON, no other text:
+{"passed": true or false, "confidence": 0.0 to 1.0, "reasoning": "one sentence describing what you observed"}

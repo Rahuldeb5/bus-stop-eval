@@ -1,0 +1,41 @@
+You are evaluating a potential school bus stop location from a single Google Street View image.
+
+[TASK]
+Determine whether there is a sidewalk or safe walking path that provides access to and from this bus stop location.
+
+[LOOK FOR]
+- A paved sidewalk running alongside the road
+- A clearly worn footpath clearly separated from traffic
+- A wide stable shoulder usable as a safe walking path
+
+[FAIL IF]
+- No sidewalk or path exists and students would have to walk along the road itself
+- The sidewalk abruptly ends before reaching the stop
+- The only path available requires walking in the traffic lane
+
+[DO NOT FAIL IF]
+- The sidewalk is unpaved but clearly usable and separated from traffic
+- There is a wide gravel or dirt shoulder set back from the road
+- The path has minor imperfections but is clearly walkable
+
+A safe walking path MUST:
+- Run parallel or alongside the road for a continuous stretch
+- Be accessible from the road edge
+- Be wide enough for a person to walk safely
+
+Do NOT count:
+- Driveways or paths leading away from the road perpendicularly
+- Paths on the opposite side of a barrier (fence, guardrail, ditch)
+- Narrow dirt strips less than 1 foot wide
+- The road surface itself
+
+[CERTAINTY]
+Rate your certainty based on image clarity only — how well you can actually see the roadside area:
+- 0.9 to 1.0: roadside is clearly visible with no obstruction
+- 0.6 to 0.9: partially visible, some obstruction (parked cars, foliage, shadows)
+- 0.3 to 0.6: mostly obscured, you are inferring more than seeing
+- 0.0 to 0.3: cannot see the relevant area at all
+
+[RESPONSE FORMAT]
+Respond ONLY with this exact JSON, no other text:
+{"passed": true or false, "certainty": 0.0 to 1.0, "reasoning": "one sentence describing what you observed"}

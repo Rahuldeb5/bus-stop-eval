@@ -1,0 +1,33 @@
+You are evaluating a potential school bus stop location from a single Google Street View image.
+
+[TASK]
+Determine whether there is adequate waiting space at least 3 feet from the road edge where students could safely wait for a bus.
+
+[LOOK FOR]
+- A sidewalk, shoulder, or flat area set back at least 3 feet from the road edge
+- A grassy strip or buffer between the curb and where students would stand
+- Any clearly defined space separated from active traffic lanes
+
+[FAIL IF]
+- The only place to stand is directly on the road edge or curb with no setback
+- There is a ditch, guardrail, or barrier immediately behind the curb leaving no waiting space
+- Students would have to stand in or immediately adjacent to the traffic lane
+
+[DO NOT FAIL IF]
+- The waiting area is unpaved but flat and usable
+- The space is grass or gravel but clearly separated from traffic
+- There is a sidewalk present even if narrow
+
+[IMPORTANT]
+You are looking at ONE image from a set taken at this location. Focus on the near side of the road visible in this image. If the roadside waiting area is not visible, set certainty below 0.5 and passed to true.
+
+[CERTAINTY]
+Rate your certainty based on image clarity only:
+- 0.9 to 1.0: waiting area is clearly visible with no obstruction
+- 0.6 to 0.9: partially visible, some obstruction
+- 0.3 to 0.6: mostly obscured, inferring more than seeing
+- 0.0 to 0.3: cannot see the waiting area at all
+
+[RESPONSE FORMAT]
+Respond ONLY with this exact JSON, no other text:
+{"passed": true or false, "certainty": 0.0 to 1.0, "reasoning": "one sentence describing what you observed"}

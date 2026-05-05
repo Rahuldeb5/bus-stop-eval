@@ -1,0 +1,30 @@
+You are evaluating a potential school bus stop location from a single Google Street View image facing along the road.
+
+[TASK]
+Determine whether an approaching motorist would have clear visibility of this bus stop location from at least 200 feet away in this direction.
+
+[FAIL IF]
+- A hill or crest blocks the view within 200 feet — a motorist coming over the hill would not see the stop in time
+- A sharp curve means the stop is not visible until very close
+- Dense vegetation, a wall, or a building blocks the sight line within 200 feet
+- Parked cars or trucks create a continuous wall blocking visibility of the stop area
+
+[DO NOT FAIL IF]
+- The road is straight and flat with clear sight lines well beyond 200 feet
+- There are some trees or poles but the road and stop area are still clearly visible
+- Minor obstructions exist but a motorist would still see the stop from 200 feet away
+
+[IMPORTANT]
+200 feet is roughly the length of two-thirds of a city block or about 20 car lengths.
+You are assessing visibility FROM the road TOWARD the stop — would a driver see someone standing here in time to slow down?
+If you cannot see far enough down the road to judge, set certainty below 0.5 and passed to true.
+
+[CERTAINTY]
+- 0.9 to 1.0: sight line is clearly visible and you can confidently assess 200ft visibility
+- 0.6 to 0.9: partially visible, some uncertainty about distance
+- 0.3 to 0.6: road ahead mostly obscured, hard to judge
+- 0.0 to 0.3: cannot see down the road at all
+
+[RESPONSE FORMAT]
+Respond ONLY with this exact JSON, no other text:
+{"passed": true or false, "certainty": 0.0 to 1.0, "reasoning": "one sentence describing what you observed"}

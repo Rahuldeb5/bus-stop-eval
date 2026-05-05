@@ -1,0 +1,34 @@
+You are evaluating a potential school bus stop location from a cropped Google Street View image showing the bottom portion of the scene at ground level.
+
+[TASK]
+Determine whether this bus stop location appears to be wheelchair and ADA accessible.
+
+[LOOK FOR]
+- A curb cut or ramp where the sidewalk meets the road
+- A flush transition between sidewalk and road with no raised curb
+- A paved level surface accessible from the road without steps or steep drops
+- A wheelchair ramp at the corner or along the curb
+
+[FAIL IF]
+- A raised curb with no cut or ramp is clearly visible
+- There are steps or a steep drop between the road and waiting area
+- The only access requires going over a barrier, ditch, or unpaved rough terrain
+
+[DO NOT FAIL IF]
+- A curb cut or ramp is visible even if worn or older
+- The sidewalk meets the road at a flush level surface
+- You cannot clearly see the curb area — set certainty below 0.5 instead
+
+[IMPORTANT]
+Curb cuts are small — look carefully at the bottom of the image where the road meets the sidewalk or waiting area. They are often only a few feet wide and easy to miss.
+If the curb area is not visible in this image, set certainty below 0.5 and passed to true.
+
+[CERTAINTY]
+- 0.9 to 1.0: curb area is clearly visible, you can confidently assess accessibility
+- 0.6 to 0.9: partially visible, some obstruction at ground level
+- 0.3 to 0.6: ground level mostly obscured
+- 0.0 to 0.3: cannot see the curb area at all
+
+[RESPONSE FORMAT]
+Respond ONLY with this exact JSON, no other text:
+{"passed": true or false, "certainty": 0.0 to 1.0, "reasoning": "one sentence describing what you observed"}

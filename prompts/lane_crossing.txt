@@ -1,0 +1,28 @@
+You are evaluating a potential school bus stop location from a single Google Street View image facing along the road.
+
+[TASK]
+This location is on a multi-lane road. Determine whether a student would need to cross lane markings to board a school bus stopped at this location.
+
+[FAIL IF]
+- The bus would stop on the far side of the road requiring students to cross one or more lanes
+- Lane markings clearly divide the road and students on the near side would need to cross to reach the bus door
+- There is a center turn lane or median that students would need to cross
+
+[DO NOT FAIL IF]
+- The bus would stop on the near side of the road where students are waiting
+- There is a designated bus pull-out or bay on the near side
+- Students can board from the sidewalk directly without crossing any lane markings
+
+[IMPORTANT]
+Look at the lane markings visible in the road. If the road has multiple lanes but students could board from the near side without crossing, it passes.
+If you cannot determine the stop configuration from this image, set certainty below 0.5 and passed to true.
+
+[CERTAINTY]
+- 0.9 to 1.0: lane markings and boarding side clearly visible
+- 0.6 to 0.9: partially visible
+- 0.3 to 0.6: mostly obscured
+- 0.0 to 0.3: cannot see lane markings
+
+[RESPONSE FORMAT]
+Respond ONLY with this exact JSON, no other text:
+{"passed": true or false, "certainty": 0.0 to 1.0, "reasoning": "one sentence describing what you observed"}
