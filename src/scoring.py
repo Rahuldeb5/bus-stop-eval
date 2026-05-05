@@ -1,46 +1,42 @@
 from src.models import CriterionResult, Importance
 
-IMPORTANCE_WEIGHTS = {
-    Importance.CRITICAL: 40,
-    Importance.HIGH:     20,
-    Importance.MEDIUM:   10,
-    Importance.LOW:       5,
+PENALTY_FACTORS = {
+    Importance.CRITICAL: 0.40,
+    Importance.HIGH:     0.72,
+    Importance.MEDIUM:   0.88,
+    Importance.LOW:      0.95,
+}
+
+BONUS_PENALTIES = {
+    Importance.CRITICAL: 25,
+    Importance.HIGH:      0,
+    Importance.MEDIUM:    0,
+    Importance.LOW:       0,
 }
 
 def compute_score(results: list[CriterionResult]) -> dict:
-    """
-    Returns a score 0-100, a verdict, and failures grouped by importance.
-    Any single CRITICAL failure → INADEQUATE regardless of score.
-    """
-    total_weight = 0
-    lost_weight = 0
-
-    failures = {
-        "critical": [],
-        "high":     [],
-        "medium":   [],
-        "low":      [],
-    }
+    failures = {"critical": [], "high": [], "medium": [], "low": []}
+    score = 100.0
+    bonus_deductions = 0
 
     for r in results:
         if r.passed is None or r.importance is None:
             continue
-        weight = IMPORTANCE_WEIGHTS.get(r.importance, 0)
-        total_weight += weight
         if not r.passed:
-            lost_weight += weight
+            score *= PENALTY_FACTORS[r.importance]
+            bonus_deductions += BONUS_PENALTIES[r.importance]
             failures[r.importance.value].append({
                 "criterion": r.criterion,
                 "notes": r.notes,
             })
 
-    score = round((1 - lost_weight / total_weight) * 100, 1) if total_weight > 0 else None
+    score = round(score - bonus_deductions, 1)
 
     if failures["critical"]:
         verdict = "INADEQUATE"
     elif score is None:
         verdict = "UNKNOWN"
-    elif score >= 75:
+    elif score >= 80:
         verdict = "ADEQUATE"
     elif score >= 50:
         verdict = "REVIEW"

@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from contextlib import contextmanager
+import json
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "../data/evaluations.db")
 
@@ -13,6 +14,7 @@ CREATE TABLE IF NOT EXISTS evaluations (
     snapped_lng REAL,
     score       REAL,
     verdict     TEXT,
+    failures TEXT,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -43,8 +45,9 @@ def init_db():
 def save_evaluation(result: dict):
     with get_conn() as conn:
         conn.execute("""
-            INSERT OR REPLACE INTO evaluations (id, lat, lng, snapped_lat, snapped_lng, score, verdict)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO evaluations 
+            (id, lat, lng, snapped_lat, snapped_lng, score, verdict, failures)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             result["job_id"],
             result["lat"],
@@ -53,6 +56,7 @@ def save_evaluation(result: dict):
             result["snapped_lng"],
             result.get("score"),
             result.get("verdict"),
+            json.dumps(result.get("failures", {})),
         ))
         conn.executemany("""
             INSERT INTO results (eval_id, criterion, passed, importance, notes)
@@ -78,4 +82,7 @@ def get_evaluation(job_id: str) -> dict | None:
         results = conn.execute(
             "SELECT * FROM results WHERE eval_id = ?", (job_id,)
         ).fetchall()
-        return {**dict(row), "results": [dict(r) for r in results]}
+        
+        row_dict = dict(row)
+        row_dict["failures"] = json.loads(row_dict.get("failures") or "{}")
+        return {**row_dict, "results": [dict(r) for r in results]}
