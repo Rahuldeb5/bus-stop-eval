@@ -8,7 +8,7 @@ def haversine_distance(loc1: dict, loc2: dict) -> float:
     
     Args:
         loc1: {"latitude": float, "longitude": float}
-        loc2: {"latitude": float, "longitude": float}ss
+        loc2: {"latitude": float, "longitude": float}
     
     Returns:
         Distance in meters.

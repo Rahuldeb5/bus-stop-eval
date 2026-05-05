@@ -1,5 +1,5 @@
 import json, base64, requests
-from src.config import LM_STUDIO_URL, MODEL
+from src.config import LM_STUDIO_URL, MODEL, DEBUG
 
 def encode_image(path: str) -> str:
     with open(path, "rb") as f:
@@ -23,6 +23,9 @@ def evaluate_single_image(image_path: str, prompt: str) -> dict:
     }
     response = requests.post(f"{LM_STUDIO_URL}/chat/completions", json=payload)
     raw = response.json()["choices"][0]["message"]["content"]
+
+    if DEBUG:
+        print(f"  [LLM raw] {raw}")
 
     try:
         clean = raw.strip().removeprefix("```json").removesuffix("```").strip()

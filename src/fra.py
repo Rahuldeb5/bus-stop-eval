@@ -1,6 +1,7 @@
+import os
 import pandas as pd
 from collections import defaultdict
-from src.config import FRA_PATH
+from src.config import DATA_DIR, FRA_PATH
 from src.utils import haversine_distance
 
 CELL_SIZE = 0.01
@@ -11,7 +12,7 @@ _fra_index = None
 def _ensure_fra_loaded():
     global _fra_df, _fra_index
     if _fra_df is None:
-        _fra_df = _load_fra_crossings(FRA_PATH)
+        _fra_df = _load_fra_crossings(os.path.join(DATA_DIR, FRA_PATH))
         _fra_index = _build_spatial_index(_fra_df)
 
 def _load_fra_crossings(csv_path: str) -> pd.DataFrame:

@@ -22,17 +22,18 @@ from src.checks.llm_checks import (
     check_obstructions,
     check_water_body,
 )
+from src.scoring import compute_score
 
 
-def run_all_llm_checks(stop_id: int | str, elements: list) -> list[CriterionResult]:
+def run_all_llm_checks(stop_id: int | str, elements: list, set_name: str = "main") -> list[CriterionResult]:
     """Run all VLM-based checks in parallel. max_workers=4 to respect LM Studio limits."""
     checks = [
-        lambda: check_sidewalk(stop_id),
-        lambda: check_waiting_area(stop_id),
-        lambda: check_visibility(stop_id),
-        lambda: check_ada(stop_id),
-        lambda: check_obstructions(stop_id),
-        lambda: check_water_body(stop_id, elements),
+        lambda: check_sidewalk(stop_id, set_name),
+        lambda: check_waiting_area(stop_id, set_name),
+        lambda: check_visibility(stop_id, set_name),
+        lambda: check_ada(stop_id, set_name),
+        lambda: check_obstructions(stop_id, set_name),
+        lambda: check_water_body(stop_id, elements, set_name),
     ]
 
     results = []
@@ -78,15 +79,22 @@ def evaluate_location(
         check_bike_lane(elements),
     ]
 
-    llm_results = run_all_llm_checks(stop_id, elements)
+    llm_results = run_all_llm_checks(stop_id, elements, set_name)
+
+    all_results = api_results + llm_results
+    scoring = compute_score(all_results)
 
     return {
         "stop_id": stop_id,
+        "lat": loc.lat,
+        "lng": loc.lng,
         "snapped_lat": loc.lat,
         "snapped_lng": loc.lng,
-        "results": api_results + llm_results,
+        "score":   scoring["score"],
+        "verdict": scoring["verdict"],
+        "failures": scoring["failures"],
+        "results": all_results,
     }
-
 
 def evaluate_from_coordinates(lat: float, lng: float, set_name: str = "web") -> dict:
     """

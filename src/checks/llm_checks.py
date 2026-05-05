@@ -9,13 +9,13 @@ from src.images import (
 from src.llm import evaluate_with_voting, evaluate_single_image
 from src.overpass import _overpass_query
 
-def check_sidewalk(stop_id: int) -> CriterionResult:
+def check_sidewalk(stop_id: int | str, set_name: str = "main") -> CriterionResult:
     """
     Check for sidewalk or safe walking path to the stop.
     Uses N/S images from all three positions (origin, fwd, bwd).
     Any direction showing no path is evidence of failure.
     """
-    image_paths = get_original_images(stop_id)
+    image_paths = get_original_images(stop_id, set_name)
     prompt = load_prompt("sidewalk")
     result = evaluate_with_voting(image_paths, prompt)
 
@@ -26,12 +26,12 @@ def check_sidewalk(stop_id: int) -> CriterionResult:
         notes=result["reasoning"],
     )
 
-def check_waiting_area(stop_id: int) -> CriterionResult:
+def check_waiting_area(stop_id: int | str, set_name: str = "main") -> CriterionResult:
     """
     Check for an adequate waiting area at the stop.
     Uses original 4-direction images.
     """
-    image_paths = get_original_images(stop_id)
+    image_paths = get_original_images(stop_id, set_name)
     prompt = load_prompt("waiting_area")
     result = evaluate_with_voting(image_paths, prompt)
 
@@ -42,12 +42,12 @@ def check_waiting_area(stop_id: int) -> CriterionResult:
         notes=result["reasoning"],
     )
 
-def check_visibility(stop_id: int) -> CriterionResult:
+def check_visibility(stop_id: int | str, set_name: str = "main") -> CriterionResult:
     """
     Check sight lines along the road in both directions.
     Uses enhanced N/S images from origin, fwd, and bwd positions.
     """
-    image_paths = get_visibility_images(stop_id)
+    image_paths = get_visibility_images(stop_id, set_name)
     prompt = load_prompt("visibility")
     result = evaluate_with_voting(image_paths, prompt)
 
@@ -58,12 +58,12 @@ def check_visibility(stop_id: int) -> CriterionResult:
         notes=result["reasoning"],
     )
 
-def check_ada(stop_id: int) -> CriterionResult:
+def check_ada(stop_id: int | str, set_name: str = "main") -> CriterionResult:
     """
     Check for ADA-accessible curb cuts and landing area.
     Uses E/W images which show the curb cross-section best.
     """
-    image_paths = get_ada_images(stop_id)
+    image_paths = get_ada_images(stop_id, set_name)
     prompt = load_prompt("ada")
     result = evaluate_with_voting(image_paths, prompt)
 
@@ -74,12 +74,12 @@ def check_ada(stop_id: int) -> CriterionResult:
         notes=result["reasoning"],
     )
 
-def check_obstructions(stop_id: int) -> CriterionResult:
+def check_obstructions(stop_id: int | str, set_name: str = "main") -> CriterionResult:
     """
     Check for physical obstructions at the stop (poles, vegetation, parked cars, etc).
     Uses all 4 original directions — obstructions can appear from any angle.
     """
-    image_paths = get_obstruction_images(stop_id)
+    image_paths = get_obstruction_images(stop_id, set_name)
     prompt = load_prompt("obstructions")
     result = evaluate_with_voting(image_paths, prompt)
 
@@ -90,7 +90,7 @@ def check_obstructions(stop_id: int) -> CriterionResult:
         notes=result["reasoning"],
     )
 
-def check_water_body(stop_id: int, elements: list) -> CriterionResult:
+def check_water_body(stop_id: int | str, elements: list, set_name: str = "main") -> CriterionResult:
     """
     Check for water hazard within 150ft with no physical barrier.
 
@@ -117,7 +117,7 @@ def check_water_body(stop_id: int, elements: list) -> CriterionResult:
 
     if not water_detected:
         print("  OSM clear — checking VLM for water...", end=" ", flush=True)
-        image_paths = get_original_images(stop_id)
+        image_paths = get_original_images(stop_id, set_name)
         detect_results = [
             evaluate_single_image(p, load_prompt("water_detect"))
             for p in image_paths
@@ -155,7 +155,7 @@ def check_water_body(stop_id: int, elements: list) -> CriterionResult:
     ]
     osm_barrier_hint = len(barrier_elements) > 0
 
-    image_paths = get_original_images(stop_id)
+    image_paths = get_original_images(stop_id, set_name)
     barrier_results = [
         evaluate_single_image(p, load_prompt("water_barrier"))
         for p in image_paths

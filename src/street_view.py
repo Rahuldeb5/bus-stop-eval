@@ -14,7 +14,7 @@ def check_street_view_coverage(lat: float, lng: float) -> bool:
 def _capture_directions(lat: float, lng: float, bearing: float, img_id: int, set_name: str, suffix: str):
     """Capture 4 directional images at a given position. Suffix is '' for origin, 'fwd'/'bwd' for offsets."""
     directions = ["n", "e", "s", "w"]
-    path = os.path.join(IMAGE_DIR.replace("main", set_name), str(img_id))
+    path = os.path.join(IMAGE_DIR, set_name, str(img_id))
     os.makedirs(path, exist_ok=True)
 
     for i, direction in enumerate(directions):
