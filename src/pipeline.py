@@ -23,6 +23,7 @@ from src.checks.llm_checks import (
     check_water_body,
 )
 from src.scoring import compute_score
+from src.roads import reverse_geocode
 
 
 def run_all_llm_checks(stop_id: int | str, elements: list, set_name: str = "main") -> list[CriterionResult]:
@@ -122,6 +123,14 @@ def evaluate_from_coordinates(lat: float, lng: float, set_name: str = "web") -> 
         }
 
     loc = Location(lat=snapped_lat, lng=snapped_lng)
+    
+    geo = reverse_geocode(snapped_lat, snapped_lng)
+    
     result = evaluate_location(loc, job_id, set_name)
     result["job_id"] = job_id
+    result["city"]    = geo["city"]
+    result["state"]   = geo["state"]
+    result["country"] = geo["country"]
+    result["lat"]     = lat
+    result["lng"]     = lng
     return result

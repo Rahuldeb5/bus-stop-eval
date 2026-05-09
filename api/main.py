@@ -5,10 +5,11 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from api.db import init_db, save_evaluation, get_evaluation
+from api.db import init_db, save_evaluation, get_evaluation, get_evaluations
 from api.cleanup import cleanup_old_images, cleanup_images
 from src.pipeline import evaluate_from_coordinates
 from src.config import IMAGE_DIR
@@ -20,6 +21,13 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="Bus Stop Evaluator", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 web_image_dir = os.path.join(IMAGE_DIR, "web")
 os.makedirs(web_image_dir, exist_ok=True)
@@ -44,6 +52,9 @@ class FailureGroup(BaseModel):
 
 class EvaluateResponse(BaseModel):
     job_id:      str
+    city:        str | None
+    state:       str | None
+    country:     str | None
     snapped_lat: float
     snapped_lng: float
     score:       float | None
@@ -51,7 +62,6 @@ class EvaluateResponse(BaseModel):
     failures:    FailureGroup
     results:     list[CriterionResponse]
     image_urls:  list[str]
-
 
 def _image_urls(job_id: str) -> list[str]:
     """Return public URLs for all images associated with a job."""
@@ -103,6 +113,9 @@ async def evaluate(req: EvaluateRequest, background_tasks=None):
 
     return EvaluateResponse(
         job_id=result["job_id"],
+        city=result.get("city"),
+        state=result.get("state"),
+        country=result.get("country"),
         snapped_lat=result["snapped_lat"],
         snapped_lng=result["snapped_lng"],
         score=result.get("score"),
@@ -126,6 +139,9 @@ async def get_evaluation_by_id(job_id: str):
 
     return EvaluateResponse(
         job_id=job_id,
+        city=saved.get("city"),
+        state=saved.get("state"),
+        country=saved.get("country"),
         snapped_lat=saved["snapped_lat"],
         snapped_lng=saved["snapped_lng"],
         score=saved.get("score"),
@@ -136,6 +152,11 @@ async def get_evaluation_by_id(job_id: str):
         results=_format_results(saved["results"]),
         image_urls=_image_urls(job_id),
     )
+
+
+@app.get("/evaluations")
+async def list_evaluations(limit: int = 50):
+    return get_evaluations(limit=limit)
 
 
 @app.get("/health")

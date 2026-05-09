@@ -1,6 +1,18 @@
-import { EvaluationResult } from "@/types"
+import { EvaluationResult, Verdict } from "@/types"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+
+export interface EvaluationSummary {
+  id:          string
+  city:        string | null
+  state:       string | null
+  country:     string | null
+  snapped_lat: number
+  snapped_lng: number
+  score:       number | null
+  verdict:     Verdict
+  created_at:  string
+}
 
 export async function evaluate(lat: number, lng: number): Promise<EvaluationResult> {
   const res = await fetch(`${API_BASE}/evaluate`, {
@@ -23,4 +35,10 @@ export async function getEvaluation(jobId: string): Promise<EvaluationResult> {
 
 export function imageUrl(path: string): string {
   return `${API_BASE}${path}`
+}
+
+export async function getEvaluations(limit = 50): Promise<EvaluationSummary[]> {
+  const res = await fetch(`${API_BASE}/evaluations?limit=${limit}`)
+  if (!res.ok) throw new Error("Failed to fetch history")
+  return res.json()
 }

@@ -69,3 +69,24 @@ def get_speed_limit(loc: Location) -> int | None:
         return None
     
     return speed_limits[0].get("speedLimit")
+
+def reverse_geocode(lat: float, lng: float) -> dict:
+    """Returns city and state for a lat/lng using Google Geocoding API."""
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {"latlng": f"{lat},{lng}", "key": GOOGLE_API_KEY}
+    data = requests.get(url, params=params).json()
+
+    city, state, country = None, None, None
+    for result in data.get("results", []):
+        for component in result.get("address_components", []):
+            types = component.get("types", [])
+            if "locality" in types:
+                city = component["long_name"]
+            if "administrative_area_level_1" in types:
+                state = component["short_name"]
+            if "country" in types:
+                country = component["short_name"]
+        if city and state:
+            break
+
+    return {"city": city, "state": state, "country": country}

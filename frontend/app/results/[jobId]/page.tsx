@@ -6,10 +6,12 @@ import ScoreDisplay from "@/components/ScoreDisplay"
 import FailuresPanel from "@/components/FailuresPanel"
 import ImageGallery from "@/components/ImageGallery"
 
-export default async function ResultsPage({ params }: { params: { jobId: string } }) {
+export default async function ResultsPage({ params }: { params: Promise< { jobId: string } >} ) {
+  const { jobId } = await params
+  
   let result
   try {
-    result = await getEvaluation(params.jobId)
+    result = await getEvaluation(jobId)
   } catch {
     notFound()
   }
@@ -33,8 +35,11 @@ export default async function ResultsPage({ params }: { params: { jobId: string 
           stop assessment
         </Typography>
         <Typography sx={{ fontFamily: '"JetBrains Mono", monospace', fontSize: "0.75rem", color: "#444" }}>
+          {[result.city, result.state, result.country].filter(Boolean).join(", ")}
+          &nbsp;&nbsp;·&nbsp;&nbsp;
           {result.snapped_lat.toFixed(6)}, {result.snapped_lng.toFixed(6)}
-          &nbsp;&nbsp;·&nbsp;&nbsp;job {result.job_id}
+          &nbsp;&nbsp;·&nbsp;&nbsp;
+          job {result.job_id}
         </Typography>
       </Box>
 

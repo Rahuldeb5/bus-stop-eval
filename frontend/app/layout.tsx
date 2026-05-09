@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
-import { ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
-import { theme } from "@/lib/theme"
+import Navbar from "@/components/Navbar"
+import { Box } from "@mui/material"
+import { ThemeModeProvider } from "../lib/ThemeContext"
 
 export const metadata: Metadata = {
   title: "Bus Stop Evaluator",
@@ -20,12 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body style={{ background: "#080808" }}>
+      <body>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
+          <ThemeModeProvider>
             <CssBaseline />
-            {children}
-          </ThemeProvider>
+            <Navbar />
+            <Box sx={{ pt: "57px" }}>{children}</Box>
+          </ThemeModeProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

@@ -12,9 +12,12 @@ CREATE TABLE IF NOT EXISTS evaluations (
     lng         REAL,
     snapped_lat REAL,
     snapped_lng REAL,
+    city        TEXT,
+    state       TEXT,
+    country     TEXT,
     score       REAL,
     verdict     TEXT,
-    failures TEXT,
+    failures    TEXT,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -45,15 +48,18 @@ def init_db():
 def save_evaluation(result: dict):
     with get_conn() as conn:
         conn.execute("""
-            INSERT OR REPLACE INTO evaluations 
-            (id, lat, lng, snapped_lat, snapped_lng, score, verdict, failures)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO evaluations
+            (id, lat, lng, snapped_lat, snapped_lng, city, state, country, score, verdict, failures)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             result["job_id"],
             result["lat"],
             result["lng"],
             result["snapped_lat"],
             result["snapped_lng"],
+            result.get("city"),
+            result.get("state"),
+            result.get("country"),
             result.get("score"),
             result.get("verdict"),
             json.dumps(result.get("failures", {})),
@@ -62,13 +68,8 @@ def save_evaluation(result: dict):
             INSERT INTO results (eval_id, criterion, passed, importance, notes)
             VALUES (?, ?, ?, ?, ?)
         """, [
-            (
-                result["job_id"],
-                r.criterion,
-                r.passed,
-                r.importance.value if r.importance else None,
-                r.notes,
-            )
+            (result["job_id"], r.criterion, r.passed,
+             r.importance.value if r.importance else None, r.notes)
             for r in result["results"]
         ])
 
@@ -86,3 +87,15 @@ def get_evaluation(job_id: str) -> dict | None:
         row_dict = dict(row)
         row_dict["failures"] = json.loads(row_dict.get("failures") or "{}")
         return {**row_dict, "results": [dict(r) for r in results]}
+
+def get_evaluations(limit: int = 50) -> list[dict]:
+    """Return recent evaluations for the history page, no results rows needed."""
+    with get_conn() as conn:
+        rows = conn.execute("""
+            SELECT id, city, state, country, snapped_lat, snapped_lng,
+                   score, verdict, created_at
+            FROM evaluations
+            ORDER BY created_at DESC
+            LIMIT ?
+        """, (limit,)).fetchall()
+        return [dict(r) for r in rows]

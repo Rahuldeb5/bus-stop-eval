@@ -18,9 +18,11 @@ export interface Failures {
   medium:   FailureItem[]
   low:      FailureItem[]
 }
-
 export interface EvaluationResult {
   job_id:      string
+  city:        string | null
+  state:       string | null
+  country:     string | null
   snapped_lat: number
   snapped_lng: number
   score:       number | null
